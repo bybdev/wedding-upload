@@ -20,8 +20,13 @@ export default function AdminPanel() {
 
   const createFolder = async () => {
     if (!newFolderName) return;
-    const { error } = await supabase.storage.from(bucketName).upload(`${newFolderName}/.keep`, new Blob([""]));
+
+    // Klasör adını temizle ve özel karakterleri _ ile değiştir
+    const cleanFolderName = newFolderName.trim().replace(/[^a-zA-Z0-9-_]/g, "_");
+
+    const { error } = await supabase.storage.from(bucketName).upload(`${cleanFolderName}/.keep`, new Blob([""]));
     if (error) return alert("Klasör oluşturma hatası: " + error.message);
+
     setNewFolderName("");
     fetchFolders();
   };
@@ -115,9 +120,7 @@ export default function AdminPanel() {
         >
           <option value="">Klasör seçin</option>
           {folders.map((folder) => (
-            <option key={folder} value={folder}>
-              {folder}
-            </option>
+            <option key={folder} value={folder}>{folder}</option>
           ))}
         </select>
         <button
@@ -143,9 +146,7 @@ export default function AdminPanel() {
         >
           <option value="">İçeriğini görmek istediğiniz klasörü seçin</option>
           {folders.map((folder) => (
-            <option key={folder} value={folder}>
-              {folder}
-            </option>
+            <option key={folder} value={folder}>{folder}</option>
           ))}
         </select>
       </div>
@@ -164,7 +165,6 @@ export default function AdminPanel() {
         </div>
       )}
 
-      {/* --- FOTOĞRAF GALERİSİ YENİ TASARIM --- */}
       {folderFiles.length > 0 ? (
         <div
           style={{
